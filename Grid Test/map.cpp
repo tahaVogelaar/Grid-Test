@@ -79,8 +79,8 @@ void Map::update(const sf::Vector2f& viewPos, sf::Event& event, bool canPlace, G
 {
 	mousePosition = sf::Mouse::getPosition(window) + static_cast<sf::Vector2i>(viewPos);
 
-	if (canPlace && 0 < mousePosition.x && mousePosition.x < windowSize.x &&
-		0 < mousePosition.y && sf::Mouse::getPosition(window).y < windowSize.y && sf::Mouse::isButtonPressed(sf::Mouse::Left) && *cashPtr >= obj.getCost())
+	if (sf::Mouse::getPosition(window).x < windowSize.x && sf::Mouse::getPosition(window).y < windowSize.y && 0 <= sf::Mouse::getPosition(window).x && 0 <= sf::Mouse::getPosition(window).y &&
+		sf::Mouse::isButtonPressed(sf::Mouse::Left) && *cashPtr >= obj.getCost() && canPlace)
 	{
 		Cell* cell = getCellByPos(static_cast<sf::Vector2f>(mousePosition));
 		if (cell)
@@ -99,10 +99,12 @@ void Map::update(const sf::Vector2f& viewPos, sf::Event& event, bool canPlace, G
 		}
 	}
 
+	// render
 	sf::Vector2f position;
 	sf::Vector2f offset(std::fmod(-viewPos.x, cellSize), std::fmod(-viewPos.y, cellSize));
 	sf::Vector2i cordinate;
 	int c = 0;
+	TextureVarible tVar(textures[TextureId(true)]);
 
 	for (int x = 0; x < viewGridSize + 1; x++)
 	{
@@ -116,7 +118,20 @@ void Map::update(const sf::Vector2f& viewPos, sf::Event& event, bool canPlace, G
 			if (getCellByCordinate(cordinate))
 			{
 				tVar = textures[getCellByCordinate(cordinate)->getTextureId()];
+				renderMap[c].color = getCellByCordinate(cordinate)->getColor();
+				renderMap[c+1].color = getCellByCordinate(cordinate)->getColor();
+				renderMap[c+2].color = getCellByCordinate(cordinate)->getColor();
+				renderMap[c+3].color = getCellByCordinate(cordinate)->getColor();
 			}
+			else
+			{
+				tVar = textures[TextureId(true)];
+				renderMap[c].color = sf::Color::White;
+				renderMap[c+1].color = sf::Color::White;
+				renderMap[c+2].color = sf::Color::White;
+				renderMap[c+3].color = sf::Color::White;
+			}
+
 
 			renderMap[c].position = position;
 			renderMap[c].texCoords.x = tVar.x;
@@ -145,9 +160,6 @@ void Map::placeCell(Cell* cell, const int& textureId, const int& blockId, const 
 	cell->setColor(c);
 
 	giveCellTexture(*cell);
-	for (short i = 0; i < 4; i++)
-		if (getNeighbour(cell->getCordinate(), i))
-			giveCellTexture(*getNeighbour(cell->getCordinate(), i));
 }
 
 void Map::createCell(const sf::Vector2i& cor, const int& tId, const int& bId, const sf::Color& c)
@@ -156,21 +168,30 @@ void Map::createCell(const sf::Vector2i& cor, const int& tId, const int& bId, co
 	map.insert(std::make_pair(cor, cell));
 
 	giveCellTexture(cell);
-	for (short i = 0; i < 4; i++)
-		if (getNeighbour(cell.getCordinate(), i))
-			giveCellTexture(*getNeighbour(cell.getCordinate(), i));
 }
 
-void Map::giveCellTexture(Cell& cell)
+void Map::giveCellBit(Cell& cell)
 {
-	for (size_t i = 0; i < 4; i++)
+	Cell* n = nullptr;
+	for (short i = 0; i < 4; i++)
 	{
-		if (getNeighbour(cell.getCordinate(), i))
-			cell.setTextureBit(!(getNeighbour(cell.getCordinate(), i)->getTextureId().id == cell.getTextureId().id && getNeighbour(cell.getCordinate(), i)->getBlockId() == cell.getBlockId()), i);
+		n = getNeighbour(cell.getCordinate(), i);
+		if (n != nullptr)
+			cell.setTextureBit(!(n->getTextureId().id == cell.getTextureId().id && n->getBlockId() == cell.getBlockId()), i);
 		else
 			cell.setTextureBit(true, i);
 	}
 }
+
+void Map::giveCellTexture(Cell& cell)
+{
+	giveCellBit(cell);
+	for (short i = 0; i < 4; i++)
+		if(getNeighbour(cell.getCordinate(), i))
+		giveCellBit(*getNeighbour(cell.getCordinate(), i));
+	giveCellBit(cell);
+}
+
 void Map::draw()
 {
 	window.draw(renderMap, &texture);
@@ -201,7 +222,6 @@ Cell* Map::getNeighbour(const sf::Vector2i& pos, const short& n)
 		return getCellByCordinate(sf::Vector2i(pos.x - 1, pos.y));
 		break;
 	}
-	return nullptr;
 }
 
 Cell* Map::getCellByCordinate(const sf::Vector2i& cor)
@@ -275,9 +295,6 @@ void Map::readFile()
 		}
 		createCell(sf::Vector2i(x, y), tId, bId, c);
 		giveCellTexture(*currentCell);
-		for (size_t i = 0; i < 4; i++)
-			if (getNeighbour(currentCell->getCordinate(), i))
-				giveCellTexture(*getNeighbour(currentCell->getCordinate(), i));
 		numb.clear();
 	}
 

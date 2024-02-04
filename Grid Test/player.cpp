@@ -37,13 +37,6 @@ void Player::moveToPosition(const sf::Vector2f& pos)
 
 bool Player::findNewPath()
 {
-    if (map.getCellByCordinate(static_cast<sf::Vector2i>(position) / static_cast<int>(map.getCellSize()))->cellType == CellType::blocked)
-    {
-        return false;
-    }
-    begin = std::chrono::steady_clock::now();
-    path = AStar(map, position, targetPosition);
-    currentPosition = 0;
     return true;
 }
 
@@ -54,33 +47,7 @@ void Player::newTargetPosition()
 
 bool Player::update()
 {
-    if (std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - begin).count() > reloadAStarTime)
-    {
-        newTargetPosition();
-        if (!findNewPath())
-            return false;
-    }
-
-    if (currentPosition < path.maxCells && path.pathFound)
-    {
-        if (position == path.path[currentPosition].first && path.path[currentPosition].second->cellType != CellType::blocked)
-        {
-            currentPosition++;
-        }
-        else if (path.path[currentPosition].second->cellType == CellType::blocked) // path is blocked after the path was found
-        {
-            if (!findNewPath())
-                return false;
-        }
-
-        moveToPosition(path.path[currentPosition].first);
-    }
-    else if (currentPosition == path.maxCells && path.pathFound) // arrived
-    {
-        newTargetPosition();
-        if (!findNewPath())
-            return false;
-    }
+    return true;
 }
 
 void Player::draw(sf::RenderWindow& w, const sf::Vector2f& vpos)

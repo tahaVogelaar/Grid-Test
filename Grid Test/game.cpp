@@ -13,17 +13,14 @@ int viewGridSize = 16;
 sf::Font font;
 sf::Texture texture;
 const float BUiRatio = .25f;
-
-void createTexture(std::unordered_map<TextureId, TextureVarible>& t);
+std::unordered_map<TextureId, TextureVarible> textures;
 
 int game()
 {
 	// load the game files
 	if (font.loadFromFile("extentions/OpenSans-Bold.ttf"));
-	std::unordered_map<TextureId, TextureVarible> textures;
 	texture.loadFromFile("extentions/grid textures.png");
 	createTexture(textures); // load textures
-
 
 	// delta time
 	std::chrono::steady_clock::time_point begin;
@@ -40,8 +37,6 @@ int game()
 	}
 	View view(window, map.getCellSize());
 	map.cashPtr = &view.cash;
-	// load files
-
 
 	while (window.isOpen())
 	{

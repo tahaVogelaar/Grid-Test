@@ -7,11 +7,6 @@
 
 class GameObject;
 
-enum CellType {
-	empty = 0,
-	blocked = 1
-};
-
 namespace std {
 	template <> struct hash<sf::Vector2i>
 	{
@@ -31,7 +26,7 @@ class Cell {
 	int blockId;
 	TextureId textureid;
 	const sf::Vector2i cordinate;
-	sf::Color color;
+	sf::Color color = sf::Color::White;
 
 public:
 	void setCost(const sf::Vector2i& start, const sf::Vector2i& end);
@@ -53,7 +48,6 @@ public:
 	// a star
 	int Gcost = 0, Hcost = 0, Fcost = 0;
 	bool open = false, closed = false;
-	CellType cellType = CellType::empty;
 	Cell* parent = nullptr;
 };
 
@@ -64,8 +58,8 @@ class Map {
 
 	// window and cells
 	sf::RenderWindow& window;
-	const float cellSize;
 	const sf::Vector2i windowSize;
+	const float cellSize;
 	sf::Vector2i mousePosition;
 
 	// rendering
@@ -90,7 +84,7 @@ public:
 	bool cellExists(const Cell* cell);
 	bool cellExistsCor(const sf::Vector2i& cor);
 	bool cellExistsPos(const sf::Vector2f& pos);
-	unsigned long long int* cashPtr = nullptr; // i was lazy
+	int* cashPtr = nullptr; // i was lazy
 	void placeCell(Cell* cor, const int& textureId, const int& blockId, const sf::Color& c);
 	void readFile();
 
@@ -99,5 +93,6 @@ public:
 private:
 	void addVertex();
 	void giveCellTexture(Cell& cell);
+	void giveCellBit(Cell& cell);
 	void createCell(const sf::Vector2i& cor, const int& textureId, const int& blockId, const sf::Color& c);
 };

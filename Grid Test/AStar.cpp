@@ -75,7 +75,7 @@ AStarPath AStar(Map& map, const sf::Vector2f& playerPos, const sf::Vector2i& tar
 		for (short i = 0; i < 4; i++)
 		{
 			neighbour = map.getNeighbour(current->getCordinate(), i);
-			if (neighbour != nullptr && neighbour->cellType != CellType::blocked && !neighbour->closed)
+			if (neighbour != nullptr /* && neighbour->cellType != CellType::blocked */ && !neighbour->closed)
 			{
 				int dis = current->Gcost + getDistance(current->getCordinate(), neighbour->getCordinate());
 				if (neighbour->Gcost > dis || !neighbour->open)
