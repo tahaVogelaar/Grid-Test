@@ -113,14 +113,9 @@ void Map::update(const sf::Vector2f& viewPos, sf::Event& event, bool canPlace, G
 			cordinate.x = x + (viewPos.x / cellSize);
 			cordinate.y = y + (viewPos.y / cellSize);
 
-			TextureVarible tVar(textures[TextureId(true)]);
 			if (getCellByCordinate(cordinate))
 			{
 				tVar = textures[getCellByCordinate(cordinate)->getTextureId()];
-				renderMap[c].color = getCellByCordinate(cordinate)->getColor();
-				renderMap[c+1].color = getCellByCordinate(cordinate)->getColor();
-				renderMap[c+2].color = getCellByCordinate(cordinate)->getColor();
-				renderMap[c+3].color = getCellByCordinate(cordinate)->getColor();
 			}
 
 			renderMap[c].position = position;
