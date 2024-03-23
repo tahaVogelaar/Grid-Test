@@ -155,5 +155,44 @@ void createTexture(std::unordered_map<TextureId, TextureVarible>& t)
 	pair.first.bitset[3] = false;
 	pair.second.x = 11;
 	pair.second.y = 55;
-	t.insert(pair); // 
+	t.insert(pair);
+
+
+	// kassa
+	pair.first.id = 
+	// worker
+	pair.first.bitset[0] = false;
+	pair.first.bitset[1] = false;
+	pair.first.bitset[2] = false;
+	pair.first.bitset[3] = false;
+	pair.second.x = 33;
+	pair.second.y = 11;
+	t.insert(pair);
+
+	// vertical band
+	pair.first.bitset[0] = false;
+	pair.first.bitset[1] = false;
+	pair.first.bitset[2] = false;
+	pair.first.bitset[3] = false;
+	pair.second.x = 33;
+	pair.second.y = 33;
+	t.insert(pair);
+
+	// band up end
+	pair.first.bitset[0] = false;
+	pair.first.bitset[1] = false;
+	pair.first.bitset[2] = false;
+	pair.first.bitset[3] = false;
+	pair.second.x = 33;
+	pair.second.y = 0;
+	t.insert(pair);
+
+	// band down end
+	pair.first.bitset[0] = false;
+	pair.first.bitset[1] = false;
+	pair.first.bitset[2] = false;
+	pair.first.bitset[3] = false;
+	pair.second.x = 33;
+	pair.second.y = 22;
+	t.insert(pair);
 }

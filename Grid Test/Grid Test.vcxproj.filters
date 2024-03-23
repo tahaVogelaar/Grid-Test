@@ -22,7 +22,7 @@
     <ClCompile Include="map.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="npc.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="view.cpp">
@@ -51,7 +51,7 @@
     <ClInclude Include="view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
+    <ClInclude Include="npc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">

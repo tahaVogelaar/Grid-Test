@@ -10,7 +10,7 @@ int getDistance(const sf::Vector2i& posA, const sf::Vector2i& posB)
 	return 14 * disX + 10 * (disY - disX);
 }
 
-void resetPath(std::queue<Cell*>& Qopen, std::queue<Cell*>& Qclosed)
+void resetPath(std::queue<Tile*>& Qopen, std::queue<Tile*>& Qclosed)
 {
 	while (!Qopen.empty())
 	{
@@ -24,29 +24,29 @@ void resetPath(std::queue<Cell*>& Qopen, std::queue<Cell*>& Qclosed)
 	}
 }
 
-AStarPath AStar(Map& map, const sf::Vector2f& playerPos, const sf::Vector2i& targetCor)
+AStarPath AStar(Map& map, const sf::Vector2i& playerPos, const sf::Vector2i& targetCoor, std::unordered_set<int>& walkeble)
 {
-	std::queue<Cell*> Qopen, Qclosed;
-	Cell* startCell = map.getCellByPos(playerPos);
-	Cell* endCell = map.getCellByCordinate(targetCor);
-	if (startCell == nullptr || endCell == nullptr)
+	std::queue<Tile*> Qopen, Qclosed;
+	Tile* startTile = map.getTileByCordinate(playerPos);
+	Tile* endTile = map.getTileByCordinate(targetCoor);
+	if (startTile == nullptr || endTile == nullptr)
 	{
 		resetPath(Qopen, Qclosed);
 		return AStarPath(false);
 	}
-	else if (startCell->getCordinate() == endCell->getCordinate())
+	else if (startTile->getCoordinate() == endTile->getCoordinate())
 	{
 		AStarPath a(true);
-		a.path.push_back(std::pair<sf::Vector2f, Cell*>(static_cast<sf::Vector2f>(endCell->getCordinate()) * map.getCellSize(), endCell));
+		a.path.push_back(endTile);
 		resetPath(Qopen, Qclosed);
 		return a;
 	}
 
-	startCell->open = true;
-	Qopen.push(startCell);
+	startTile->open = true;
+	Qopen.push(startTile);
 
-	Cell* current;
-	Cell* neighbour = nullptr;
+	Tile* current;
+	Tile* neighbour = nullptr;
 
 	while (!Qopen.empty())
 	{
@@ -57,16 +57,15 @@ AStarPath AStar(Map& map, const sf::Vector2f& playerPos, const sf::Vector2i& tar
 		current->closed = true;
 		Qclosed.push(current);
 
-		if (current == endCell)
+		if (current == endTile)
 		{
 			AStarPath path(true);
-			Cell* parentCell = endCell->parent;
-			path.path.push_back(std::pair<sf::Vector2f, Cell*>(static_cast<sf::Vector2f>(endCell->getCordinate()) * map.getCellSize(), parentCell));
-			while (parentCell->parent != nullptr)
+			Tile* parentTile = endTile;
+			while (parentTile != nullptr)
 			{
 				path.maxCells++;
-				path.path.push_back(std::pair<sf::Vector2f, Cell*>(static_cast<sf::Vector2f>(endCell->getCordinate()) * map.getCellSize(), parentCell));
-				parentCell = parentCell->parent;
+				path.path.push_back(parentTile);
+				parentTile = parentTile->parent;
 			}
 			resetPath(Qopen, Qclosed);
 			return path;
@@ -74,14 +73,14 @@ AStarPath AStar(Map& map, const sf::Vector2f& playerPos, const sf::Vector2i& tar
 
 		for (short i = 0; i < 4; i++)
 		{
-			neighbour = map.getNeighbour(current->getCordinate(), i);
-			if (neighbour != nullptr /* && neighbour->cellType != CellType::blocked */ && !neighbour->closed)
+			neighbour = map.getNeighbour(current->getCoordinate(), i);
+			if (neighbour != nullptr && walkeble.find(neighbour->getTileId()) != walkeble.end() && !neighbour->closed)
 			{
-				int dis = current->Gcost + getDistance(current->getCordinate(), neighbour->getCordinate());
+				int dis = current->Gcost + getDistance(current->getCoordinate(), neighbour->getCoordinate());
 				if (neighbour->Gcost > dis || !neighbour->open)
 				{
 					neighbour->Gcost = dis;
-					neighbour->Hcost = getDistance(neighbour->getCordinate(), endCell->getCordinate());
+					neighbour->Hcost = getDistance(neighbour->getCoordinate(), endTile->getCoordinate());
 					neighbour->Fcost = neighbour->Gcost + neighbour->Hcost;
 
 					neighbour->parent = current;

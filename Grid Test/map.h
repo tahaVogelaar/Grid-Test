@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 
+
 class GameObject;
 
 namespace std {
@@ -22,77 +23,78 @@ namespace std {
 	};
 }
 
-class Cell {
-	int blockId;
+class Tile {
+	int tileId;
 	TextureId textureid;
-	const sf::Vector2i cordinate;
+	const sf::Vector2i coordinate;
 	sf::Color color = sf::Color::White;
 
 public:
 	void setCost(const sf::Vector2i& start, const sf::Vector2i& end);
-	void setBlockId(const int& id) { this->blockId = id; }
+	void setTextureBit(bool b, const short& i) { textureid.bitset[i] = b; }
+	//void setObject(const GameObject& obj) { textureid = obj.getTextureId(); tileId = obj.getTileId(); color = obj.getColor(); }
+	void setTileId(const int& id) { this->tileId = id; }
 	void setColor(const sf::Color& c) { color = c; }
 	void setTextureId(const int& tid) { textureid.id = tid; }
-	void setTextureBit(bool b, const short& i) { textureid.bitset[i] = b; }
 
-	const int getBlockId() const { return blockId; }
+	const int getTileId() const { return tileId; }
 	const sf::Color getColor() const { return color; }
 	const TextureId getTextureId() const { return textureid; }
-	const sf::Vector2i getCordinate() const { return cordinate; }
+	const sf::Vector2i getCoordinate() const { return coordinate; }
 
-	Cell(const sf::Vector2i& cor, const int& tId, const int& bId, const sf::Color& c);
-	Cell() {}
+	Tile(const sf::Vector2i& cor, const int& tId, const int& bId, const sf::Color& c);
+	Tile() {}
 
 	void reset();
 
 	// a star
 	int Gcost = 0, Hcost = 0, Fcost = 0;
 	bool open = false, closed = false;
-	Cell* parent = nullptr;
+	Tile* parent = nullptr;
 };
 
 class Map {
 	// memory
-	std::unordered_map<sf::Vector2i, Cell> map;
+	std::unordered_map<sf::Vector2i, Tile> map;
 	std::unordered_map<TextureId, TextureVarible>& textures;
 
 	// window and cells
 	sf::RenderWindow& window;
 	const sf::Vector2i windowSize;
-	const float cellSize;
+	const float tileSize;
 	sf::Vector2i mousePosition;
 
 	// rendering
 	int viewGridSize;
 	sf::VertexArray renderMap;
-	std::unordered_map<sf::Vector2i, TextureVarible> renderCells;
+	std::unordered_map<sf::Vector2i, TextureVarible> renderTile;
+	const sf::Texture texture;
 
 	std::string fileString;
 public:
-	Map(sf::RenderWindow& w, int viewGridSize, std::unordered_map<TextureId, TextureVarible>&, std::string);
+	Map(sf::RenderWindow& w, int viewGridSize, std::unordered_map<TextureId, TextureVarible>&, std::string, const sf::Texture&);
 	void update(const sf::Vector2f& viewPos, sf::Event& event, bool canPlace, GameObject& obj);
 	void draw();
 
-	Cell* getCellByPos(const sf::Vector2f& pos);
-	Cell* getNeighbour(const sf::Vector2i& pos, const short& n);
-	Cell* getCellByCordinate(const sf::Vector2i& cor);
+	Tile* getTileByPos(const sf::Vector2f& pos);
+	Tile* getNeighbour(const sf::Vector2i& pos, const short& n);
+	Tile* getTileByCordinate(const sf::Vector2i& cor);
 	sf::VertexArray getRenderMap() { return renderMap; }
-	float getCellSize() { return cellSize; }
+	float getTileSize() { return tileSize; }
 	sf::Vector2i getWindowSize();
-	sf::Vector2i getRandomCell();
+	sf::Vector2i getRandomTile();
 
-	bool cellExists(const Cell* cell);
-	bool cellExistsCor(const sf::Vector2i& cor);
-	bool cellExistsPos(const sf::Vector2f& pos);
+	bool tileExists(const Tile* tile);
+	bool tileExistsCoor(const sf::Vector2i& coor);
+	bool tileExistsPos(const sf::Vector2f& pos);
 	int* cashPtr = nullptr; // i was lazy
-	void placeCell(Cell* cor, const int& textureId, const int& blockId, const sf::Color& c);
 	void readFile();
 
 	~Map();
 
 private:
 	void addVertex();
-	void giveCellTexture(Cell& cell);
-	void giveCellBit(Cell& cell);
-	void createCell(const sf::Vector2i& cor, const int& textureId, const int& blockId, const sf::Color& c);
+	void giveTileTexture(Tile& tile);
+	void giveTileBit(Tile& tile);
+	bool placeTile(const sf::Vector2i& coor, const GameObject& obj);
 };
